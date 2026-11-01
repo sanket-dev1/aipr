@@ -9,82 +9,54 @@ const practicals = [
   {
     prNo: 1,
     title: "Design and Implement a Simple Reflex Agent for the Vacuum Cleaner World and Analyze Its Rational Behavior in a Given Environment",
-    code: `import java.util.ArrayList;
+    code: `
+# Simple Reflex Agent - Vacuum Cleaner World
 
-class Percept {
-    String location;
-    boolean isDirty;
-
-    Percept(String location, boolean isDirty) {
-        this.location = location;
-        this.isDirty = isDirty;
-    }
+# Initial environment
+rooms = {
+    'A': 'Dirty',
+    'B': 'Dirty'
 }
 
-class SimpleReflexVacuumAgent {
-    String location = "A";
-    ArrayList<Percept> perceptSequence = new ArrayList<>();
-    ArrayList<String> actions = new ArrayList<>();
+# Initial position of vacuum cleaner
+position = 'A'
 
-    void addPercept(String location, boolean isDirty) {
-        perceptSequence.add(new Percept(location, isDirty));
-    }
+# Number of steps
+steps = 4
 
-    void addAction(String action) {
-        actions.add(action);
-    }
+print("Initial Environment:", rooms)
+print("Vacuum Cleaner starts at:", position)
 
-    void executeActions() {
-        for (int i = 0; i < actions.size(); i++) {
-            Percept p = perceptSequence.get(i);
-            System.out.println("Percept: (" + p.location + ", " + p.isDirty + ") -> Action: " + actions.get(i));
+for i in range(steps):
 
-            if (actions.get(i).equals("Suck")) {
-                System.out.println("Vacuuming dirt.");
-            } else if (actions.get(i).equals("MoveLeft")) {
-                location = "A";
-                System.out.println("Moving left to location A.");
-            } else if (actions.get(i).equals("MoveRight")) {
-                location = "B";
-                System.out.println("Moving right to location B.");
-            } else if (actions.get(i).equals("DoNothing")) {
-                System.out.println("Doing nothing.");
-            }
-        }
-    }
-}
+    print("\nStep:", i + 1)
 
-public class Main {
-    static SimpleReflexVacuumAgent simpleReflexVacuumAgent(Percept[] perceptSequence) {
-        SimpleReflexVacuumAgent agent = new SimpleReflexVacuumAgent();
+    # Check current room
+    if rooms[position] == 'Dirty':
 
-        for (Percept percept : perceptSequence) {
-            agent.addPercept(percept.location, percept.isDirty);
-            if (percept.isDirty) {
-                agent.addAction("Suck");
-            } else {
-                if (percept.location.equals("A")) {
-                    agent.addAction("MoveRight");
-                } else if (percept.location.equals("B")) {
-                    agent.addAction("MoveLeft");
-                }
-            }
-        }
-        return agent;
-    }
+        print("Current Room:", position)
+        print("Action: Suck")
 
-    public static void main(String[] args) {
-        Percept[] perceptSequence = {
-            new Percept("A", true),
-            new Percept("A", false),
-            new Percept("B", true),
-            new Percept("B", false)
-        };
+        rooms[position] = 'Clean'
 
-        SimpleReflexVacuumAgent agent = simpleReflexVacuumAgent(perceptSequence);
-        agent.executeActions();
-    }
-}`,
+    elif position == 'A':
+
+        print("Current Room A is Clean")
+        print("Action: Move Right")
+
+        position = 'B'
+
+    else:
+
+        print("Current Room B is Clean")
+        print("Action: Move Left")
+
+        position = 'A'
+
+# Final environment
+print("\nFinal Environment:", rooms)
+print("Final Position:", position)
+`,
     theory: `What is an Intelligent Agent?
 An intelligent agent is a system that perceives its environment through sensors and
 performs actions through actuators to achieve a goal.
@@ -181,322 +153,116 @@ Step 10: Stop.`
     prNo: 2,
     title: "A* algorithm for 8 puzzle problem",
     code: `
-import java.util.*;
-
-class PuzzleState implements Comparable<PuzzleState> {
-
-    int[][] board;
-    int g;
-    int h;
-    int f;
-    PuzzleState parent;
-    String move;
-
-    static int[][] goal = {
-        {1, 2, 3},
-        {4, 5, 6},
-        {7, 8, 0}
-    };
-
-    PuzzleState(int[][] board, int g, PuzzleState parent, String move) {
-        this.board = copyBoard(board);
-        this.g = g;
-        this.parent = parent;
-        this.move = move;
-        this.h = calculateHeuristic();
-        this.f = g + h;
-    }
-
-    int[][] copyBoard(int[][] b) {
-        int[][] temp = new int[3][3];
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                temp[i][j] = b[i][j];
-            }
-        }
-
-        return temp;
-    }
-
-    // Count misplaced tiles, excluding blank (0)
-    int calculateHeuristic() {
-        int count = 0;
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board[i][j] != 0 &&
-                    board[i][j] != goal[i][j]) {
-                    count++;
-                }
-            }
-        }
-
-        return count;
-    }
-
-    public int compareTo(PuzzleState other) {
-        return Integer.compare(this.f, other.f);
-    }
-
-    boolean isGoal() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board[i][j] != goal[i][j]) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    void printBoard() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board[i][j] == 0) {
-                    System.out.print("_ ");
-                } else {
-                    System.out.print(board[i][j] + " ");
-                }
-            }
-
-            System.out.println();
-        }
-
-        System.out.println();
-    }
-}
-
-public class Main1 {
-
-    static PriorityQueue<PuzzleState> open =
-        new PriorityQueue<>();
-
-    static HashSet<String> closed = new HashSet<>();
-
-    static String boardToString(int[][] board) {
-        StringBuilder s = new StringBuilder();
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                s.append(board[i][j]);
-            }
-        }
 
-        return s.toString();
-    }
+import heapq
 
-    // Generate all valid child states
-    static void generateChildren(PuzzleState current) {
+# Initial and Goal states
+start = (1, 2, 3,
+         4, 0, 6,
+         7, 5, 8)
 
-        int x = 0, y = 0;
+goal = (1, 2, 3,
+        4, 5, 6,
+        7, 8, 0)
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (current.board[i][j] == 0) {
-                    x = i;
-                    y = j;
-                }
-            }
-        }
 
-        int[] dx = {-1, 1, 0, 0};
-        int[] dy = {0, 0, -1, 1};
+# Function to display puzzle
+def display(state):
+    for i in range(0, 9, 3):
+        print(state[i:i+3])
+    print()
 
-        String[] moves = {"Up", "Down", "Left", "Right"};
 
-        for (int k = 0; k < 4; k++) {
+# Display Initial and Goal states
+print("Initial State:")
+display(start)
 
-            int nx = x + dx[k];
-            int ny = y + dy[k];
+print("Goal State:")
+display(goal)
 
-            if (nx >= 0 && nx < 3 &&
-                ny >= 0 && ny < 3) {
 
-                int[][] newBoard = current.copyBoard(current.board);
+# Heuristic: Count misplaced tiles
+def heuristic(state):
+    count = 0
 
-                // Move the blank tile
-                newBoard[x][y] = newBoard[nx][ny];
-                newBoard[nx][ny] = 0;
+    for i in range(9):
+        if state[i] != 0 and state[i] != goal[i]:
+            count += 1
 
-                String key = boardToString(newBoard);
+    return count
 
-                if (!closed.contains(key)) {
-                    PuzzleState child = new PuzzleState(
-                        newBoard,
-                        current.g + 1,
-                        current,
-                        moves[k]
-                    );
 
-                    open.add(child);
-                }
-            }
-        }
-    }
+# Generate possible next states
+def get_neighbors(state):
+    neighbors = []
+    zero = state.index(0)
 
-    // Display the goal state
-    static void printGoalState() {
+    moves = [-3, 3, -1, 1]
 
-        System.out.println("\n========== GOAL STATE ==========");
+    for move in moves:
+        new = zero + move
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (PuzzleState.goal[i][j] == 0) {
-                    System.out.print("_ ");
-                } else {
-                    System.out.print(PuzzleState.goal[i][j] + " ");
-                }
-            }
+        if 0 <= new < 9:
+            if abs(move) == 3 or new // 3 == zero // 3:
 
-            System.out.println();
-        }
+                temp = list(state)
+                temp[zero], temp[new] = temp[new], temp[zero]
 
-        System.out.println("================================\n");
-    }
+                neighbors.append(tuple(temp))
 
-    // Display how the heuristic was calculated
-    static void printHeuristicCalculation(PuzzleState p) {
+    return neighbors
 
-        int count = 0;
 
-        System.out.println("\nHeuristic Calculation h(n):");
+# A* Algorithm
+def astar(start):
+    pq = []
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+    heapq.heappush(pq, (heuristic(start), 0, start, [start]))
 
-                int tile = p.board[i][j];
+    visited = set()
 
-                if (tile != 0 &&
-                    tile != PuzzleState.goal[i][j]) {
+    while pq:
 
-                    System.out.println(
-                        "Tile " + tile +
-                        " at position (" + i + ", " + j + ")" +
-                        " should be " + PuzzleState.goal[i][j]
-                    );
+        f, g, state, path = heapq.heappop(pq)
 
-                    count++;
-                }
-            }
-        }
+        if state == goal:
+            return path
 
-        System.out.println("Total misplaced tiles = " + count);
-        System.out.println("h(n) = " + count);
-    }
+        if state in visited:
+            continue
 
-    // Print the complete solution path and cost values
-    static void printSolution(PuzzleState state) {
+        visited.add(state)
 
-        Stack<PuzzleState> path = new Stack<>();
+        for next_state in get_neighbors(state):
 
-        while (state != null) {
-            path.push(state);
-            state = state.parent;
-        }
+            if next_state not in visited:
 
-        int step = 0;
+                new_g = g + 1
+                new_f = new_g + heuristic(next_state)
 
-        while (!path.isEmpty()) {
+                heapq.heappush(
+                    pq, (new_f, new_g, next_state,
+                         path + [next_state])
+                )
 
-            PuzzleState p = path.pop();
+    return None
 
-            System.out.println("\n========== STEP " + step + " ==========");
 
-            if (p.move != null) {
-                System.out.println("Move: " + p.move);
-            }
+# Find solution
+path = astar(start)
 
-            System.out.println("\nCurrent Board:");
-            p.printBoard();
 
-            System.out.println("g(n) = " + p.g);
-            System.out.println(
-                "g(n) calculation: " + p.g +
-                " move(s) from the initial state"
-            );
-
-            printHeuristicCalculation(p);
-
-            System.out.println("\nf(n) = g(n) + h(n)");
-            System.out.println(
-                "f(n) = " + p.g + " + " + p.h +
-                " = " + p.f
-            );
-
-            step++;
-        }
-
-        System.out.println("Solution found in " + (step - 1) + " moves.");
-    }
-
-    public static void main(String[] args) {
-
-        Scanner sc = new Scanner(System.in);
-
-        // Clear previous search data
-        open.clear();
-        closed.clear();
-
-        int[][] start = new int[3][3];
-        boolean[] seen = new boolean[9];
-
-        System.out.println("===== 8-PUZZLE USING A* SEARCH =====");
-        System.out.println("Enter Initial Board (0 for Blank):");
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-
-                int value = sc.nextInt();
-
-                if (value < 0 || value > 8 || seen[value]) {
-                    System.out.println(
-                        "Invalid board! Enter each number from 0 to 8 exactly once."
-                    );
-                    sc.close();
-                    return;
-                }
-
-                start[i][j] = value;
-                seen[value] = true;
-            }
-        }
-
-        PuzzleState initial = new PuzzleState(start, 0, null, null);
-
-        open.add(initial);
-
-        while (!open.isEmpty()) {
-
-            PuzzleState current = open.poll();
-
-            String currentKey = boardToString(current.board);
-
-            if (closed.contains(currentKey)) {
-                continue;
-            }
-
-            if (current.isGoal()) {
-
-                System.out.println("\nGOAL REACHED!");
-
-                printGoalState();
-                printSolution(current);
-
-                sc.close();
-                return;
-            }
-
-            closed.add(currentKey);
-
-            generateChildren(current);
-        }
-
-        System.out.println("Solution Not Found.");
-        sc.close();
-    }
-}`,
+# Display solution
+if path:
+    print("Solution Found!")
+    print("Total Moves:", len(path) - 1)
+
+    for state in path:
+        display(state)
+
+else:
+    print("No Solution Found")
+`,
     theory: `Theory:
 A* algorithm:
 A* is a computer algorithm that is widely used in path finding and graph traversal, the process of
@@ -553,235 +319,66 @@ Step 14: Stop.`
     prNo: 3,
     title: "Tower of Hanoi using State Space Search",
     code: `
-import java.util.*;
 
-public class Main {
+from collections import deque
 
-    // Represents a move from one peg to another
-    static class Action {
-        int source;
-        int destination;
+def bfs(n):
+    start = (tuple(range(n, 0, -1)), (), ())
+    goal = ((), (), tuple(range(n, 0, -1)))
 
-        Action(int source, int destination) {
-            this.source = source;
-            this.destination = destination;
-        }
-    }
+    queue = deque([start])
+    visited = {start}
+    parent = {start: None}
+    moves = {}
 
-    // Represents a state of the three pegs
-    static class State {
-        ArrayList<Integer>[] pegs;
+    pegs = ['A', 'B', 'C']
 
-        State() {
-            pegs = new ArrayList[3];
+    while queue:
+        state = queue.popleft()
 
-            for (int i = 0; i < 3; i++) {
-                pegs[i] = new ArrayList<>();
-            }
-        }
+        if state == goal:
+            path = []
 
-        // Creates a deep copy of the state
-        State copy() {
-            State newState = new State();
+            while parent[state] is not None:
+                path.append(moves[state])
+                state = parent[state]
 
-            for (int i = 0; i < 3; i++) {
-                newState.pegs[i] = new ArrayList<>(pegs[i]);
-            }
+            path.reverse()
 
-            return newState;
-        }
+            print("Solution:")
+            for move in path:
+                print(move)
 
-        // Compares two states
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
+            print("Total moves:", len(path))
+            return
 
-            if (!(obj instanceof State)) {
-                return false;
-            }
+        for i in range(3):
+            for j in range(3):
+                if i == j or not state[i]:
+                    continue
 
-            State other = (State) obj;
+                new_state = [list(p) for p in state]
+                disk = new_state[i][-1]
 
-            return Arrays.equals(pegs, other.pegs);
-        }
+                if not new_state[j] or new_state[j][-1] > disk:
+                    new_state[i].pop()
+                    new_state[j].append(disk)
 
-        // Generates a hash code for the state
-        @Override
-        public int hashCode() {
-            return Arrays.hashCode(pegs);
-        }
-    }
+                    new_state = tuple(tuple(p) for p in new_state)
 
-    // Represents a node in the BFS search
-    static class Node {
-        State state;
-        ArrayList<Action> path;
+                    if new_state not in visited:
+                        visited.add(new_state)
+                        parent[new_state] = state
+                        moves[new_state] = (
+                            f"Move disk {disk} "
+                            f"from {pegs[i]} to {pegs[j]}"
+                        )
+                        queue.append(new_state)
 
-        Node(State state, ArrayList<Action> path) {
-            this.state = state;
-            this.path = path;
-        }
-    }
 
-    // Creates the initial state: all disks on Peg A
-    static State getInitialState(int numDisks) {
-        State state = new State();
-
-        for (int disk = numDisks; disk >= 1; disk--) {
-            state.pegs[0].add(disk);
-        }
-
-        return state;
-    }
-
-    // Creates the goal state: all disks on Peg C
-    static State getGoalState(int numDisks) {
-        State state = new State();
-
-        for (int disk = numDisks; disk >= 1; disk--) {
-            state.pegs[2].add(disk);
-        }
-
-        return state;
-    }
-
-    // Generates all valid next states
-    static ArrayList<Map.Entry<State, Action>> getSuccessors(
-            State state) {
-
-        ArrayList<Map.Entry<State, Action>> successors =
-                new ArrayList<>();
-
-        for (int source = 0; source < 3; source++) {
-            for (int target = 0; target < 3; target++) {
-
-                if (source == target) {
-                    continue;
-                }
-
-                if (state.pegs[source].isEmpty()) {
-                    continue;
-                }
-
-                int movingDisk =
-                        state.pegs[source].get(
-                                state.pegs[source].size() - 1);
-
-                // A larger disk cannot be placed on a smaller disk
-                if (!state.pegs[target].isEmpty()
-                        && state.pegs[target].get(
-                                state.pegs[target].size() - 1)
-                        < movingDisk) {
-                    continue;
-                }
-
-                State newState = state.copy();
-
-                newState.pegs[source].remove(
-                        newState.pegs[source].size() - 1);
-
-                newState.pegs[target].add(movingDisk);
-
-                Action action = new Action(source, target);
-
-                successors.add(
-                        new AbstractMap.SimpleEntry<>(
-                                newState, action));
-            }
-        }
-
-        return successors;
-    }
-
-    // Solves Tower of Hanoi using BFS
-    static ArrayList<Action> solveHanoiStateSpace(int numDisks) {
-
-        State startState = getInitialState(numDisks);
-        State goalState = getGoalState(numDisks);
-
-        Queue<Node> queue = new LinkedList<>();
-        Set<State> visited = new HashSet<>();
-
-        queue.add(new Node(startState, new ArrayList<>()));
-        visited.add(startState);
-
-        while (!queue.isEmpty()) {
-
-            Node current = queue.poll();
-
-            // Check whether the goal state is reached
-            if (current.state.equals(goalState)) {
-                return current.path;
-            }
-
-            ArrayList<Map.Entry<State, Action>> successors =
-                    getSuccessors(current.state);
-
-            for (Map.Entry<State, Action> successor : successors) {
-
-                State nextState = successor.getKey();
-                Action action = successor.getValue();
-
-                if (!visited.contains(nextState)) {
-
-                    visited.add(nextState);
-
-                    ArrayList<Action> newPath =
-                            new ArrayList<>(current.path);
-
-                    newPath.add(action);
-
-                    queue.add(new Node(nextState, newPath));
-                }
-            }
-        }
-
-        return new ArrayList<>();
-    }
-
-    // Prints the solution
-    static void printSolution(int numDisks,
-                              ArrayList<Action> path) {
-
-        System.out.println(
-                "--- Solved Tower of Hanoi for "
-                        + numDisks + " Disks ---");
-
-        System.out.println(
-                "Minimum moves required: " + path.size());
-
-        char[] pegMap = {'A', 'B', 'C'};
-
-        for (int i = 0; i < path.size(); i++) {
-
-            Action action = path.get(i);
-
-            System.out.println(
-                    "Step " + (i + 1)
-                            + ": Move disk from Peg "
-                            + pegMap[action.source]
-                            + " -> Peg "
-                            + pegMap[action.destination]);
-        }
-    }
-
-    // Main method
-    public static void main(String[] args) {
-
-        int disks = 3;
-
-        ArrayList<Action> solutionPath =
-                solveHanoiStateSpace(disks);
-
-        if (solutionPath.isEmpty()) {
-            System.out.println("No solution found.");
-        } else {
-            printSolution(disks, solutionPath);
-        }
-    }
-}`,
+n = int(input("Enter number of disks: "))
+bfs(n)
+`,
     theory: `Theory:
 State space search:
 State-space search is a problem-solving method in which every possible configuration of a problem
@@ -838,108 +435,72 @@ Step 14: Stop.`
     prNo: 4,
     title: "Local Beam Search for the Travelling Salesman Problem",
     code: `
-import java.util.*;
+class Path:
+    def __init__(self, nodes, distance):
+        self.nodes = nodes
+        self.distance = distance
 
-public class Main {
 
-    // Represents a path and its total distance
-    static class Path {
-        ArrayList<Integer> nodes;
-        int distance;
+def beamSearch(distances, beta):
 
-        Path(ArrayList<Integer> nodes, int distance) {
-            this.nodes = nodes;
-            this.distance = distance;
-        }
-    }
+    pathsSoFar = [Path([], 0)]
 
-    static ArrayList<Path> beamSearch(int[][] distances, int beta) {
+    for idx in range(len(distances)):
 
-        ArrayList<Path> pathsSoFar = new ArrayList<>();
+        if idx > 0:
+            print("Paths kept after tier", idx - 1)
 
-        pathsSoFar.add(new Path(new ArrayList<>(), 0));
+            for path in pathsSoFar:
+                print(path.nodes, "Distance =", path.distance)
 
-        for (int idx = 0; idx < distances.length; idx++) {
+        pathsAtTier = []
 
-            if (idx > 0) {
-                System.out.println(
-                        "Paths kept after tier " + (idx - 1) + ":");
+        # Extend each existing path
+        for path in pathsSoFar:
 
-                for (Path path : pathsSoFar) {
-                    System.out.println(
-                            path.nodes + ", Distance = " + path.distance);
-                }
-            }
+            for j in range(len(distances[idx])):
 
-            ArrayList<Path> pathsAtTier = new ArrayList<>();
+                pathExtended = path.nodes.copy()
+                pathExtended.append(j)
 
-            // Extend each existing path
-            for (Path path : pathsSoFar) {
+                newDistance = path.distance + distances[idx][j]
 
-                for (int j = 0; j < distances[idx].length; j++) {
+                pathsAtTier.append(
+                    Path(pathExtended, newDistance)
+                )
 
-                    ArrayList<Integer> pathExtended =
-                            new ArrayList<>(path.nodes);
+        # Sort paths by distance
+        pathsAtTier.sort(key=lambda path: path.distance)
 
-                    pathExtended.add(j);
+        # Keep only best beta paths
+        pathsSoFar = pathsAtTier[:beta]
 
-                    int newDistance =
-                            path.distance + distances[idx][j];
+        print("\nPaths reduced to after tier", idx)
 
-                    pathsAtTier.add(
-                            new Path(pathExtended, newDistance));
-                }
-            }
+        # Print discarded paths
+        for path in pathsAtTier[beta:]:
+            print(path.nodes, "Distance =", path.distance)
 
-            // Sort paths by total distance in ascending order
-            pathsAtTier.sort(
-                    Comparator.comparingInt(path -> path.distance));
+    return pathsSoFar
 
-            // Keep only the best beta paths
-            pathsSoFar.clear();
 
-            int count = Math.min(beta, pathsAtTier.size());
+# Main program
+dists = [
+    [0, 10, 15, 20],
+    [10, 0, 35, 25],
+    [15, 35, 0, 30],
+    [20, 25, 30, 0]
+]
 
-            for (int i = 0; i < count; i++) {
-                pathsSoFar.add(pathsAtTier.get(i));
-            }
+beta = 2
 
-            System.out.println(
-                    "\nPaths reduced to after tier " + idx + ":");
+bestPaths = beamSearch(dists, beta)
 
-            // Print discarded paths
-            for (int i = beta; i < pathsAtTier.size(); i++) {
-                Path path = pathsAtTier.get(i);
+print("\nThe best paths:")
 
-                System.out.println(
-                        path.nodes + ", Distance = " + path.distance);
-            }
-        }
-
-        return pathsSoFar;
-    }
-
-    public static void main(String[] args) {
-
-        int[][] dists = {
-                {0, 10, 15, 20},
-                {10, 0, 35, 25},
-                {15, 35, 0, 30},
-                {20, 25, 30, 0}
-        };
-
-        int beta = 2;
-
-        ArrayList<Path> bestPaths = beamSearch(dists, beta);
-
-        System.out.println("\nThe best paths:");
-
-        for (Path path : bestPaths) {
-            System.out.println(
-                    path.nodes + ", Distance = " + path.distance);
-        }
-    }
-}`,
+for path in bestPaths:
+    print(path.nodes, "Distance =", path.distance)
+`,
     theory: `Travelling Salesman Problem:
 The Travelling Salesman Problem consists of a set of cities and the distance between each pair of
 cities. The objective is to find a minimum-cost Hamiltonian cycle: a tour that starts at one city,
@@ -1006,96 +567,120 @@ the best and average tour cost.`
   {
     prNo: 5,
     title: "Implement BFS for solving the 8-puzzle problem",
-    code: `import java.util.*; 
-public class EightPuzzleBFS { 
-    static String goal = "123456780"; 
-    static int[][] moves = { 
-        {-1, 0},  // Up 
-        {1, 0},   // Down 
-        {0, -1},  // Left 
-        {0, 1}    // Right 
-    }; 
-    static class Node { 
-        String state; 
-        Node parent; 
-        Node(String state, Node parent) { 
-            this.state = state; 
-            this.parent = parent; 
-        } 
-    } 
-    static void display(String state) { 
-        for (int i = 0; i < 9; i++) { 
-            if (state.charAt(i) == '0') 
-                System.out.print("_ "); 
-            else 
-                System.out.print(state.charAt(i) + " "); 
-            if (i % 3 == 2) 
-                System.out.println(); 
-        } 
-    } 
-    static void solve(String start) { 
-        Queue<Node> queue = new LinkedList<>(); 
-        Set<String> visited = new HashSet<>(); 
-        queue.add(new Node(start, null)); 
-        visited.add(start); 
-        System.out.println("\nInitial State:"); 
-        display(start); 
-        System.out.println("\nGoal State:"); 
-        display(goal); 
-        while (!queue.isEmpty()) { 
-            Node current = queue.poll(); 
-            if (current.state.equals(goal)) { 
-                System.out.println("\nSolution Found!"); 
-                List<String> path = new ArrayList<>(); 
-                Node temp = current; 
-                while (temp != null) { 
-                    path.add(temp.state); 
-                    temp = temp.parent; 
-                } 
-                Collections.reverse(path); 
-                System.out.println("\nAll Steps:"); 
-                for (int i = 0; i < path.size(); i++) { 
-                    System.out.println("\nStep " + i + ":"); 
-                    display(path.get(i)); 
-                } 
-                System.out.println("Total Moves: " + (path.size() - 1)); 
-                System.out.println("\nFinal Goal State:"); 
-                display(current.state); 
-                return; 
-            } 
-            int zero = current.state.indexOf('0'); 
-            int x = zero / 3; 
-            int y = zero % 3; 
-            for (int[] move : moves) { 
-                int nx = x + move[0]; 
-                int ny = y + move[1]; 
-                if (nx >= 0 && nx < 3 && ny >= 0 && ny < 3) { 
-                    int newPos = nx * 3 + ny; 
-                    char[] arr = current.state.toCharArray(); 
-                    arr[zero] = arr[newPos]; 
-                    arr[newPos] = '0'; 
-                    String newState = new String(arr); 
-                    if (!visited.contains(newState)) { 
-                        visited.add(newState); 
-                        queue.add(new Node(newState, current)); 
-                    } 
-                } 
-            } 
-        } 
-        System.out.println("No solution found."); 
-    } 
-    public static void main(String[] args) { 
-        Scanner sc = new Scanner(System.in); 
- 
-        System.out.println("Enter Initial State (use 0 for blank):"); 
-        StringBuilder start = new StringBuilder(); 
-        for (int i = 0; i < 9; i++) { 
-            start.append(sc.nextInt()); 
-        } 
-        solve(start.toString()); 
-        sc.close(); 
-    } 
-}`,
+    code: `
+from collections import deque
+
+# Initial and goal states
+start = (1, 2, 3,
+         4, 0, 6,
+         7, 5, 8)
+
+goal = (1, 2, 3,
+        4, 5, 6,
+        7, 8, 0)
+
+
+# Function to display puzzle
+def display(state):
+    for i in range(0, 9, 3):
+        print(state[i:i+3])
+
+
+# Display initial and goal states
+print("Initial State:")
+display(start)
+
+print("\nGoal State:")
+display(goal)
+
+
+# Generate possible next states
+def get_neighbors(state):
+    neighbors = []
+
+    zero = state.index(0)
+
+    row = zero // 3
+    col = zero % 3
+
+    moves = [
+        (-1, 0),  # Up
+        (1, 0),   # Down
+        (0, -1),  # Left
+        (0, 1)    # Right
+    ]
+
+    for dr, dc in moves:
+        new_row = row + dr
+        new_col = col + dc
+
+        if 0 <= new_row < 3 and 0 <= new_col < 3:
+
+            new_pos = new_row * 3 + new_col
+
+            new_state = list(state)
+
+            # Swap blank with adjacent tile
+            new_state[zero], new_state[new_pos] = (
+                new_state[new_pos], new_state[zero]
+            )
+
+            neighbors.append(tuple(new_state))
+
+    return neighbors
+
+
+# BFS algorithm
+def bfs(start, goal):
+
+    queue = deque([start])
+    visited = {start}
+    parent = {start: None}
+
+    while queue:
+
+        current = queue.popleft()
+
+        if current == goal:
+
+            path = []
+
+            while current is not None:
+                path.append(current)
+                current = parent[current]
+
+            path.reverse()
+            return path
+
+        for next_state in get_neighbors(current):
+
+            if next_state not in visited:
+
+                visited.add(next_state)
+                parent[next_state] = current
+                queue.append(next_state)
+
+    return None
+
+
+# Find solution
+print("\nBFS Solution:")
+
+solution = bfs(start, goal)
+
+if solution:
+
+    print("Solution Found!")
+    print("Number of Moves:", len(solution) - 1)
+
+    for step, state in enumerate(solution):
+
+        print("\nStep", step)
+        display(state)
+
+else:
+    print("No solution found")
+`,
     theory: `Theory:
 Breadth First Search (BFS):
 Breadth First Search (BFS) is an uninformed search technique that explores a state space level
@@ -1144,40 +729,75 @@ Step 13: Stop.`
   {
     prNo: 6,
     title: "Implement DFS for Water Jug Problem",
-    code: `import java.util.*; 
-public class waterpr { 
-    static int jug1 = 4, jug2 = 3, target = 2; 
-    static Set<String> visited = new HashSet<>(); 
-    static void dfs(int a, int b) { 
-        String state = a + "," + b; 
-        if (visited.contains(state)) 
-            return; 
-        visited.add(state); 
-        System.out.println("(" + a + ", " + b + ")"); 
-        if (a == target || b == target) { 
-            System.out.println("Target reached!"); 
-            System.exit(0); 
-        } 
-        // Fill Jug 1 
-        dfs(jug1, b); 
-        // Fill Jug 2 
-        dfs(a, jug2); 
-        // Empty Jug 1 
-        dfs(0, b); 
-        // Empty Jug 2 
-        dfs(a, 0); 
-        // Pour Jug 1 into Jug 2 
-        int pour = Math.min(a, jug2 - b); 
-        dfs(a - pour, b + pour); 
-        // Pour Jug 2 into Jug 1 
-        pour = Math.min(b, jug1 - a); 
-        dfs(a + pour, b - pour); 
-    } 
-    public static void main(String[] args) { 
-        System.out.println("Water Jug Problem using DFS:"); 
-        dfs(0, 0); 
-    } 
-}`,
+    code: `
+def get_next_states(x, y):
+    states = []
+
+    # Fill 4 litre jug
+    states.append((4, y))
+
+    # Fill 3 litre jug
+    states.append((x, 3))
+
+    # Empty 4 litre jug
+    states.append((0, y))
+
+    # Empty 3 litre jug
+    states.append((x, 0))
+
+    # Pour 4 litre jug into 3 litre jug
+    pour = min(x, 3 - y)
+    states.append((x - pour, y + pour))
+
+    # Pour 3 litre jug into 4 litre jug
+    pour = min(y, 4 - x)
+    states.append((x + pour, y - pour))
+
+    return states
+
+
+def dfs():
+    start = (0, 0)
+    goal = (2, 0)
+
+    stack = [start]
+    visited = {start}
+    parent = {start: None}
+
+    while stack:
+        current = stack.pop()
+
+        if current == goal:
+            break
+
+        x, y = current
+
+        for state in get_next_states(x, y):
+            if state not in visited:
+                visited.add(state)
+                parent[state] = current
+                stack.append(state)
+
+    if goal not in visited:
+        print("Solution not found")
+        return
+
+    # Reconstruct solution path
+    path = []
+    current = goal
+
+    while current is not None:
+        path.append(current)
+        current = parent[current]
+
+    path.reverse()
+
+    print("Solution Path:")
+    for state in path:
+        print(state)
+
+dfs()
+`,
     theory: `Theory:
 Depth First Search (DFS):
 Depth First Search (DFS) is an uninformed search technique that explores a search space by
@@ -1261,53 +881,60 @@ the generated states.`
   {
     prNo: 7,
     title: "Implement Backtracking Search to Solve the 8-Queens Constraint Satisfaction Problem",
-    code: `import java.util.Arrays; 
-public class Main { 
-    static int N = 8; 
-    static int[] board = new int[N]; 
-    static boolean isSafe(int row, int col) { 
-        for (int i = 0; i < row; i++) { 
-            if (board[i] == col || 
-                Math.abs(board[i] - col) == Math.abs(i - row)) { 
-                return false; 
-            } 
-        } 
-        return true; 
-    } 
-    static boolean solve(int row) { 
-        if (row == N) 
-            return true; 
-        for (int col = 0; col < N; col++) { 
-            if (isSafe(row, col)) { 
-                board[row] = col; 
-                if (solve(row + 1)) 
-                    return true; 
-                board[row] = -1; 
-            } 
-        } 
-        return false; 
-    } 
-    public static void main(String[] args) { 
-        Arrays.fill(board, -1); 
-        if (solve(0)) { 
-            System.out.println("     8 QUEENS SOLUTION"); 
-            System.out.println("  +------------------------+"); 
-            for (int i = 0; i < N; i++) { 
-                System.out.print((i + 1) + " | "); 
-                for (int j = 0; j < N; j++) { 
-                    if (board[i] == j) 
-                        System.out.print(" Q "); 
-                    else 
-                        System.out.print(" . "); 
-                } 
-                System.out.println("|"); 
-            } 
-            System.out.println("  +------------------------+"); 
-            System.out.println("    1  2  3  4  5  6  7  8"); 
-            System.out.println("\nAll 8 queens placed successfully!"); 
-        } else { 
-            System.out.println("No solution exists."); 
-        }      }      }`,
+    code: `
+N = 8
+
+board = [-1] * N
+
+def is_safe(row, col):
+    for i in range(row):
+        # Check same column
+        if board[i] == col:
+            return False
+
+        # Check diagonal
+        if abs(board[i] - col) == abs(i - row):
+            return False
+
+    return True
+
+
+def solve(row):
+    # All 8 queens are placed
+    if row == N:
+        return True
+
+    # Try each column
+    for col in range(N):
+
+        if is_safe(row, col):
+            board[row] = col
+
+            # Move to next row
+            if solve(row + 1):
+                return True
+
+            # Backtracking
+            board[row] = -1
+
+    return False
+
+
+# Main program
+if solve(0):
+    print("Solution Found!")
+    print("Chessboard:")
+
+    for i in range(N):
+        for j in range(N):
+            if board[i] == j:
+                print("Q", end=" ")
+            else:
+                print(".", end=" ")
+        print()
+else:
+    print("No solution found")
+`,
     theory: `Theory:
 Constraint Satisfaction Problem (CSP):
 A Constraint Satisfaction Problem (CSP) is a problem in which a set of variables must be
@@ -1399,45 +1026,38 @@ arrangement of eight non-attacking queens was obtained.`
   {
     prNo: 8,
     title: "Develop a Simple Chatbot Using Predefined Rules and Pattern Matching",
-    code: `import java.util.Scanner; 
-public class chatbot { 
-    public static void main(String[] args) { 
-        Scanner sc = new Scanner(System.in); 
-        String input; 
-        System.out.println("Chatbot: Hello! Welcome to Simple Chatbot."); 
-        System.out.println("Chatbot: Type 'bye' to exit."); 
-        while (true) { 
-            System.out.print("You: "); 
-            input = sc.nextLine().toLowerCase(); 
-            if (input.contains("hello") || input.contains("hi")) { 
-                System.out.println("Chatbot: Hello! How can I help you?"); 
-            } 
-            else if (input.contains("your name")) { 
-                System.out.println("Chatbot: I am a simple Java chatbot."); 
-            } 
-            else if (input.contains("how are you")) { 
-                System.out.println("Chatbot: I am fine! How are you?"); 
-            } 
-            else if (input.contains("college")) { 
-                System.out.println("Chatbot: College is a place to learn and grow."); 
-            } 
-            else if (input.contains("java")) { 
-                System.out.println("Chatbot: Java is an object-oriented programming language."); 
-            } 
-            else if (input.contains("thank")) { 
-                System.out.println("Chatbot: You're welcome!"); 
-            } 
-            else if (input.contains("bye")) { 
-                System.out.println("Chatbot: Goodbye! Have a nice day."); 
-                break; 
-            } 
-            else { 
-                System.out.println("Chatbot: Sorry, I don't understand that."); 
-            } 
-        } 
-        sc.close(); 
-    } 
-}`,
+    code: `
+print("Welcome to Simple AI Chatbot!")
+print("Type 'bye' to exit the chatbot.")
+
+while True:
+    user_input = input("You: ").lower()
+
+    if "bye" in user_input or "exit" in user_input or "quit" in user_input:
+        print("Chatbot: Goodbye! Have a nice day.")
+        break
+
+    elif "hello" in user_input or "hi" in user_input or "hey" in user_input:
+        print("Chatbot: Hello! How can I help you?")
+
+    elif "name" in user_input:
+        print("Chatbot: I am a simple AI chatbot.")
+
+    elif "how are you" in user_input:
+        print("Chatbot: I am fine. Thank you for asking!")
+
+    elif "course" in user_input or "subject" in user_input:
+        print("Chatbot: I can provide basic information about your course.")
+
+    elif "help" in user_input:
+        print("Chatbot: Sure! You can ask me about my name, course, or general information.")
+
+    elif "thank" in user_input or "thanks" in user_input:
+        print("Chatbot: You are welcome!")
+
+    else:
+        print("Chatbot: Sorry, I do not understand your question.")
+`,
     theory: `Theory:
 Chatbot:
 A chatbot is a computer program that interacts with users through text or voice. A simple
